@@ -3,3 +3,12 @@
 cabal.sandbox.config
 dist
 dist-newstyle
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
