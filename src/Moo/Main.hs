@@ -17,7 +17,7 @@ import  Prelude  hiding (lookup)
 import  Data.Text (Text)
 import  Data.String.Conversions (cs)
 import  System.Environment (getProgName)
-import  System.Exit (ExitCode (ExitFailure), exitWith)
+import  System.Exit (exitFailure)
 
 import  Database.Schema.Migrations.Filesystem (filesystemStore, FilesystemStoreSettings(..))
 import  Database.Schema.Migrations.Store
@@ -42,13 +42,13 @@ usage = do
           putStrLn ""
 
   putStrLn commandOptionUsage
-  exitWith (ExitFailure 1)
+  exitFailure
 
 usageSpecific :: Command -> IO a
 usageSpecific command = do
   pn <- getProgName
   putStrLn $ "Usage: " ++ pn ++ " " ++ usageString command
-  exitWith (ExitFailure 1)
+  exitFailure
 
 procArgs :: Args -> IO (Command, CommandOptions, [String])
 procArgs args = do
@@ -78,6 +78,7 @@ mainWithParameters args parameters = do
           Left es -> do
             putStrLn "There were errors in the migration store:"
             forM_ es $ \err -> putStrLn $ "  " ++ show err
+            exitFailure
           Right storeData -> do
             let st = AppState { _appOptions = opts
                               , _appCommand = command
@@ -95,4 +96,4 @@ mainWithParameters args parameters = do
 reportSqlError :: SqlError -> IO a
 reportSqlError e = do
   putStrLn $ "\n" ++ "A database error occurred: " ++ seErrorMsg e
-  exitWith (ExitFailure 1)
+  exitFailure
