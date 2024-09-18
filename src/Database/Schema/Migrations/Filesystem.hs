@@ -154,10 +154,6 @@ instance ToJSON UTCTimeYaml where
     toJSON = toJSON . formatTime defaultTimeLocale utcTimeYamlFormat . unUTCTimeYaml
     toEncoding = toEncoding . formatTime defaultTimeLocale utcTimeYamlFormat . unUTCTimeYaml
 
--- Keeps things as the old Show/Read-based format, e.g "2009-04-15 10:02:06 UTC"
-utcTimeYamlFormat :: String
-utcTimeYamlFormat = "%F %T UTC"
-
 newtype DependsYaml = DependsYaml
     { unDependsYaml :: [Text]
     }

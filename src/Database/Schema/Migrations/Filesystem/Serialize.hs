@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Database.Schema.Migrations.Filesystem.Serialize
     ( serializeMigration
+    , utcTimeYamlFormat
     )
 where
 
@@ -9,7 +10,7 @@ import qualified Data.ByteString as BS
 import Data.Text ( Text )
 import qualified Data.Text as T
 import Data.String.Conversions ( cs )
-import Data.Time () -- for UTCTime Show instance
+import Data.Time (formatTime, defaultTimeLocale) -- for UTCTime Show instance
 import Data.Maybe ( catMaybes )
 import Data.Monoid ( (<>) )
 
@@ -37,7 +38,7 @@ serializeTimestamp :: FieldSerializer
 serializeTimestamp m =
     case mTimestamp m of
         Nothing -> Nothing
-        Just ts -> Just $ "Created: " <> (cs . show $ ts)
+        Just ts -> Just $ cs $ "Created: " <> (formatTime defaultTimeLocale utcTimeYamlFormat ts)
 
 serializeDepends :: FieldSerializer
 serializeDepends m = Just . cs $ "Depends: " <> (T.intercalate " " $ mDeps m)
@@ -76,3 +77,7 @@ serializeMigration :: Migration -> ByteString
 serializeMigration m = BS.intercalate "\n" fields
     where
       fields = catMaybes [ f m | f <- fieldSerializers ]
+
+-- Keeps things as the old Show/Read-based format, e.g "2009-04-15 10:02:06 UTC"
+utcTimeYamlFormat :: String
+utcTimeYamlFormat = "%F %T UTC"
